@@ -1,42 +1,37 @@
-import { deleteHabit } from "@/app/actions";
-import DayState from "@/components/DayState";
-import DeleteButton from "@/components/DeleteButton";
-import { kv } from "@vercel/kv";
+import { DayState } from "@/components/DayState";
 import Image from "next/image";
 import Link from "next/link";
 
-export type Habits = {
-  [habit: string]: Record<string, boolean>;
-} | null;
+export default function Home() {
+  const habits = {
+    "beber água": {
+      "2023-11-23": true,
+      "2023-11-24": false,
+      "2023-11-25": true,
+    },
 
-export default async function Home() {
-  const habits: Habits = await kv.hgetall("habits");
-
+    "estudar programação": {
+      "2023-11-23": true,
+      "2023-11-24": false,
+      "2023-11-25": true,
+    },
+  };
   const today = new Date();
   const todayWeekDay = today.getDay();
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-
-  const sortedWeekDays = weekDays
+  const weeksDays = ["Dom", "Seg", "Ter", "Quar", "Quin", "Sex", "Sáb"];
+  const sortedWeekDays = weeksDays
     .slice(todayWeekDay + 1)
-    .concat(weekDays.slice(0, todayWeekDay + 1));
-
-  const last7Days = weekDays
-    .map((_, index) => {
-      const date = new Date();
-      date.setDate(date.getDate() - index);
-
-      return date.toISOString().slice(0, 10);
-    })
-    .reverse();
+    .concat(weeksDays.slice(0, todayWeekDay + 1));
 
   return (
-    <main className="container relative flex flex-col gap-8 px-4 pt-16">
+    <div className="container relative flex flex-col gap-8 px-4 pt-6">
       {habits === null ||
         (Object.keys(habits).length === 0 && (
           <h1 className="mt-20 text-4xl font-light text-white font-display text-center">
-            Você não tem hábitos cadastrados
+            Você ainda não tem hábitos registrados
           </h1>
         ))}
+
       {habits !== null &&
         Object.entries(habits).map(([habit, habitStreak]) => (
           <div key={habit} className="flex flex-col gap-2">
@@ -44,30 +39,33 @@ export default async function Home() {
               <span className="text-xl font-light text-white font-sans">
                 {habit}
               </span>
-              <DeleteButton habit={habit} />
+              <button>
+                <Image
+                  src="delete.svg"
+                  alt="icone de deletar"
+                  width={20}
+                  height={20}
+                />
+              </button>
             </div>
-            <Link href={`habito/${habit}`}>
-              <section className="grid grid-cols-7 bg-neutral-800 rounded-md p-2">
-                {sortedWeekDays.map((day, index) => (
-                  <div key={day} className="flex flex-col last:font-bold">
-                    <span className="font-sans text-xs text-white text-center">
-                      {day}
-                    </span>
-                    {/* day state */}
-                    <DayState day={habitStreak[last7Days[index]]} />
-                  </div>
-                ))}
-              </section>
-            </Link>
+            <section className="grid grid-cols-7 bg-neutral-700 rounded-md p-2">
+              {sortedWeekDays.map((day) => (
+                <div key={day} className="flex flex-col last:font-bold">
+                  <span className="font-sans text-xs text-white text-center">
+                    {day}
+                  </span>
+                  <DayState day={true} />
+                </div>
+              ))}
+            </section>
           </div>
         ))}
-
       <Link
         href="novo-habito"
-        className="fixed text-center bottom-10 w-2/3 left-1/2 -translate-x-1/2 text-neutral-900 bg-[#45EDAD] font-display font-regular text-2xl p-2 rounded-md"
+        className="text-center fixed bottom-10 w-2/3 left-1/2 -translate-x-1/2 text-neutral-900 bg-[#45EDAD] font-display font-regular text-2xl p-2 rounded-md"
       >
-        novo hábito
+        Novo Hábito
       </Link>
-    </main>
+    </div>
   );
 }

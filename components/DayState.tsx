@@ -18,4 +18,4 @@ function DayState({ day }: { day: boolean | undefined }) {
   );
 }
 
-export default DayState;
+export  {DayState};
