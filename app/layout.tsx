@@ -27,7 +27,6 @@ export default function RootLayout({
           height={200}
           alt="Logo - meta diária"
         />
-
         {children}
       </body>
     </html>
